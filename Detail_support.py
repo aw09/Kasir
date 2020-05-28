@@ -6,7 +6,10 @@
 #    May 27, 2020 07:22:20 PM +07  platform: Windows NT
 
 import sys
+import pandas as pd
 import PilihProduk as pr
+import Struk as s
+from datetime import datetime
 
 try:
     import Tkinter as tk
@@ -36,8 +39,17 @@ def new(t_id, client):
     destroy_window()
     pr.add_product(t_id, client)
 
-#def new_transaction(t_id,):
-    
+def new_transaction(t_id,client,total):
+    target = 'Transaction.csv'
+    tanggal = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    df = pd.read_csv(target)
+    df2 = pd.DataFrame([[t_id,tanggal,client,total]], 
+                       columns=list(df.columns.values))
+    df = pd.concat([df,df2])
+    print(df)
+    df.to_csv(target, index=False)
+    destroy_window()
+    s.finish(client)
     
 
 if __name__ == '__main__':

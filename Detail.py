@@ -187,7 +187,7 @@ class Detail:
         self.confirm.configure(highlightcolor="black")
         self.confirm.configure(pady="0")
         self.confirm.configure(text='''Bayar''')
-        self.confirm.configure(command=lambda : Detail_support.new_transaction(t_id,client,))
+        self.confirm.configure(command=lambda : Detail_support.new_transaction(t_id,client,total))
 
         self.cancel = tk.Button(top)
         self.cancel.place(relx=0.033, rely=0.911, height=24, width=557)
