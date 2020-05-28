@@ -5,44 +5,14 @@
 #  in conjunction with Tcl version 8.6
 #    May 26, 2020 07:50:35 PM +07  platform: Windows NT
 
-import sys
-import Account as ac
+from AccountModel import Account as ac
+import uuid
 from tkinter.messagebox import showinfo
-import Login
-
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
-
-try:
-    import ttk
-    py3 = False
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = True
-
-def set_Tk_var():
-    global type
-    type = tk.StringVar()
-    global username
-    username = tk.StringVar()
-
-def init(top, gui, *args, **kwargs):
-    global w, top_level, root
-    w = gui
-    top_level = top
-    root = top
-
-def destroy_window():
-    # Function which closes the window.
-    global top_level
-    top_level.destroy()
-    top_level = None   
 
 def register(tipe, username, email, password, c_password):
     if password == c_password:
-        ac.register(tipe, username, email, password)
+        user = ac(uuid.uuid4().int, tipe, username, email, password)
+        user.write()
         showinfo("","Register Succeded !")
         login()
     else:
@@ -54,9 +24,6 @@ def login():
         
 
 
-if __name__ == '__main__':
-    import Register
-    Register.vp_start_gui()
 
 
 
