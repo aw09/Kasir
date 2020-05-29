@@ -22,20 +22,16 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import Detail_support
+import BaseView, PickProduct
+import CartModel
+from CartModel import Cart
+from ProductModel import *
+import Login
 
-client = None
-t_id = None
-def new_transaction(pelanggan):
-    global client, t_id
-    t_id = uuid.uuid4().int
-    client = pelanggan
-    vp_start_gui()
-
-def add_product(tid, user):
-    global client, t_id
-    t_id = tid
-    client = user
+def start(*args):
+    global transaction, cart
+    transaction = args[0]
+    cart = CartModel.get(transaction)
     vp_start_gui()
     
 def vp_start_gui():
@@ -43,7 +39,7 @@ def vp_start_gui():
     global val, w, root
     root = tk.Tk()
     top = Detail (root)
-    Detail_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
 
 w = None
@@ -55,7 +51,7 @@ def create_Detail(rt, *args, **kwargs):
     root = rt
     w = tk.Toplevel (root)
     top = Detail (w)
-    Detail_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_Detail():
@@ -77,7 +73,7 @@ class Detail:
         top.minsize(120, 1)
         top.maxsize(1370, 749)
         top.resizable(1, 1)
-        top.title("New Toplevel")
+        top.title("Cart")
         top.configure(background="#d9d9d9")
 
         self.Label1 = tk.Label(top)
@@ -93,7 +89,7 @@ class Detail:
         self.tanggal.configure(background="#d9d9d9")
         self.tanggal.configure(disabledforeground="#a3a3a3")
         self.tanggal.configure(foreground="#000000")
-        self.tanggal.configure(text=datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+        self.tanggal.configure(text=transaction.date)
 
         self.Label3 = tk.Label(top)
         self.Label3.place(relx=0.5, rely=0.044, height=21, width=104)
@@ -109,7 +105,7 @@ class Detail:
         self.pelanggan.configure(cursor="fleur")
         self.pelanggan.configure(disabledforeground="#a3a3a3")
         self.pelanggan.configure(foreground="#000000")
-        self.pelanggan.configure(text=client)
+        self.pelanggan.configure(text=transaction.account.username.upper())
 
         self.Frame1 = tk.Frame(top)
         self.Frame1.place(relx=0.067, rely=0.178, relheight=0.5, relwidth=0.708)
@@ -118,9 +114,8 @@ class Detail:
         self.Frame1.configure(relief="groove")
         self.Frame1.configure(background="#d9d9d9")
         
-        df = pd.read_csv('Detail.csv')
-        df = df[df['t_id']==str(t_id)]
-        cols = list(df.columns)
+        
+        cols = ['No', 'Produk', 'Qty', 'Harga', 'Subtotal']
         
         self.tree = ttk.Treeview(self.Frame1)
         self.tree.pack()
@@ -128,14 +123,21 @@ class Detail:
         self.tree.column('#0', width=minwidth)
         self.tree["columns"] = cols
         for i in cols:
-            self.tree.column(i, anchor="w", width=100)
             self.tree.heading(i, text=i.capitalize(), anchor='w')
-        
-        for index, row in df.iterrows():
-            self.tree.insert("",0,text=index,values=list(row))
+        self.tree.column('No', width=25)
+        self.tree.column('Produk', width=120)
+        self.tree.column('Qty', width=30)
+        self.tree.column('Harga', width=80)
+        self.tree.column('Subtotal', width=100)
+    
+        for i in cart:
+            index = len(cart) - cart.index(i)
+            values = [index, i.product.name, i.qty, i.product.price, i.qty*i.product.price]
+            self.tree.insert("",0,text=index,values=values)
+            
         total = 0
         for line in self.tree.get_children():
-            total += self.tree.item(line)['values'][2]
+            total += self.tree.item(line)['values'][4]
         
         self.Label5 = tk.Label(top)
         self.Label5.place(relx=0.35, rely=0.711, height=21, width=83)
@@ -149,7 +151,7 @@ class Detail:
         self.total.configure(background="#d9d9d9")
         self.total.configure(disabledforeground="#a3a3a3")
         self.total.configure(foreground="#000000")
-        self.total.configure(text=total)
+        self.total.configure(text="Rp "+ str(total))
         
         self.add = tk.Button(top)
         self.add.place(relx=0.833, rely=0.2, height=24, width=55)
@@ -162,7 +164,7 @@ class Detail:
         self.add.configure(highlightcolor="black")
         self.add.configure(pady="0")
         self.add.configure(text='''Tambah''')
-        self.add.configure(command=lambda :Detail_support.new(t_id, client))
+        self.add.configure(command=lambda :BaseView.redirect(PickProduct, transaction))
 
         self.delete = tk.Button(top)
         self.delete.place(relx=0.833, rely=0.311, height=24, width=55)
@@ -187,7 +189,7 @@ class Detail:
         self.confirm.configure(highlightcolor="black")
         self.confirm.configure(pady="0")
         self.confirm.configure(text='''Bayar''')
-        self.confirm.configure(command=lambda : Detail_support.new_transaction(t_id,client,total))
+        self.confirm.configure(command=lambda : BaseView.confirmation(transaction))
 
         self.cancel = tk.Button(top)
         self.cancel.place(relx=0.033, rely=0.911, height=24, width=557)
@@ -200,14 +202,9 @@ class Detail:
         self.cancel.configure(highlightcolor="black")
         self.cancel.configure(pady="0")
         self.cancel.configure(text='''Batal''')
+        self.cancel.configure(command=lambda : BaseView.redirect(Login))
 
         self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
         top.configure(menu = self.menubar)
-
-if __name__ == '__main__':
-    vp_start_gui()
-
-
-
 
 

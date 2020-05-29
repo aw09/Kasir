@@ -10,32 +10,28 @@ from dataclasses import dataclass
 from AccountModel import Account
 from BaseModel import BaseModel
 
-
-target = 'Transaction.csv'
+target = 'Product.csv'
 data = pd.read_csv(target)
 instances = []
 
 @dataclass
-class Transaction(BaseModel):
-    t_id: str
-    date: str
-    account: Account
-    total: int
+class Product(BaseModel):
+    p_id: str
+    name: str
+    price: int
     
     def write(self):
         super().write(data, target)
+        instances.append(self)
 
-def toObject(df):
-    obj = []
-    for index, row in df.iterrows():
-        row['account'] = eval(row['account'])
-        obj.append(Transaction(*list(row)))
-    return obj
-
-def getAll():
-    global instances, data
-    data = pd.read_csv(target)
+def getData(df=data):
+    global instances
     instances = []
-    instances = toObject(data)
+    for index, row in df.iterrows():
+        instances.append(Product(*list(row)))
+        
+def getAll():
     return instances
-getAll()
+
+getData()
+

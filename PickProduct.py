@@ -19,24 +19,24 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import PilihProduk_support
+import BaseView
+import ProductModel
 
-listProduk = None
-def add_product(tid, user):
-    global listProduk, t_id, client
-    t_id = tid
-    client = user
-    listProduk = PilihProduk_support.getProduk()
+
+def start(*args):
+    global productList, productName, transaction
+    transaction = args[0]
+    productList = ProductModel.getAll()
+    productName = [(i.name)for i in productList]
     vp_start_gui()
-    
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    PilihProduk_support.set_Tk_var()
+    BaseView.set_Tk_var()
     top = Toplevel1 (root)
-    PilihProduk_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
 
 w = None
@@ -47,9 +47,9 @@ def create_Toplevel1(rt, *args, **kwargs):
     #rt = root
     root = rt
     w = tk.Toplevel (root)
-    PilihProduk_support.set_Tk_var()
+    BaseView.set_Tk_var()
     top = Toplevel1 (w)
-    PilihProduk_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_Toplevel1():
@@ -79,7 +79,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1370, 749)
         top.resizable(1, 1)
-        top.title("New Toplevel")
+        top.title("List of Product")
         top.configure(background="#d9d9d9")
 
         self.Label1 = tk.Label(top)
@@ -139,8 +139,8 @@ class Toplevel1:
 
         self.produk = ttk.Combobox(top)
         self.produk.place(relx=0.25, rely=0.188, relheight=0.044, relwidth=0.508)
-        self.produk['value'] = listProduk.nama.values.tolist()
-        self.produk.configure(textvariable=PilihProduk_support.combobox)
+        self.produk['value'] = productName
+        #self.produk.configure(textvariable=BaseView.combobox)
         self.produk.configure(takefocus="")
         self.produk.bind('<<ComboboxSelected>>', lambda e: self.handler(self.produk.current(), self.satuan))
 
@@ -155,12 +155,10 @@ class Toplevel1:
         self.tambah.configure(highlightcolor="black")
         self.tambah.configure(pady="0")
         self.tambah.configure(text='''Tambah''')
-        self.tambah.configure(command=lambda : PilihProduk_support.add(
-            t_id,
-            client,
-            listProduk.nama.values.tolist()[self.produk.current()], 
-            self.subtotal['text']))
-
+        self.tambah.configure(command=lambda : BaseView.addProduct(
+            transaction,
+            productList[self.produk.current()],
+            int(self.jumlah.get())))
         self.batal = tk.Button(top)
         self.batal.place(relx=0.25, rely=0.877, height=24, width=187)
         self.batal.configure(activebackground="#ececec")
@@ -173,21 +171,18 @@ class Toplevel1:
         self.batal.configure(highlightcolor="black")
         self.batal.configure(pady="0")
         self.batal.configure(text='''Batal''')
+        self.batal.configure(command=lambda: BaseView.cancel(transaction))
     
     def handler(event, produk, satuan):
         if produk != -1:
-            harga = listProduk.harga.values.tolist()
+            harga = [(i.price) for i in productList]
             satuan.configure(text=harga[produk])
     def callback(sv):
         jumlah = sv.jumlah.get()
         if jumlah != '':
             jumlah = int(jumlah)
         total = jumlah*int(sv.satuan['text'])
-        sv.subtotal.configure(text=total)
-
-if __name__ == '__main__':
-    vp_start_gui()
-
+        sv.subtotal.configure(text="Rp "+ str(total))
 
 
 

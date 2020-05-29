@@ -11,6 +11,8 @@ from BaseModel import BaseModel
 
 target = 'Account.csv'
 data = pd.read_csv(target)
+instances = []
+
 @dataclass
 class Account(BaseModel):
     u_id: str
@@ -21,10 +23,34 @@ class Account(BaseModel):
     
     def write(self):
         super().write(data, target)
+    
 
-instances = []
-def getInstances():
-    for index, row in data.iterrows():
-        instances.append(Account(*list(row)))
+def toObject(df):
+    obj = []
+    for index, row in df.iterrows():
+        obj.append(Account(*list(row)))
+    return obj
+
+def getAll():
+    global instances, data
+    data = pd.read_csv(target)
+    instances = []
+    instances = toObject(data)
     return instances
+getAll()
+
+
+def findAccount(username,password):
+    getAll()
+    for i in instances:
+        if (i.username == username) & (i.password==password):
+            return i
+
+def getClient():
+    getAll()
+    client = []
+    for i in instances:
+        if(i.tipe == 'Pelanggan'):
+            client.append(i)
+    return client
 

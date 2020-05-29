@@ -5,22 +5,7 @@
 #  in conjunction with Tcl version 8.6
 #    May 26, 2020 07:50:35 PM +07  platform: Windows NT
 
-from AccountModel import Account as ac
-import uuid
-from tkinter.messagebox import showinfo
 
-def register(tipe, username, email, password, c_password):
-    if password == c_password:
-        user = ac(uuid.uuid4().int, tipe, username, email, password)
-        user.write()
-        showinfo("","Register Succeded !")
-        login()
-    else:
-        showinfo("","Check Password !!!")
-
-def login():
-    destroy_window()
-    Login.vp_start_gui()
         
 
 

@@ -46,7 +46,6 @@ def new_transaction(t_id,client,total):
     df2 = pd.DataFrame([[t_id,tanggal,client,total]], 
                        columns=list(df.columns.values))
     df = pd.concat([df,df2])
-    print(df)
     df.to_csv(target, index=False)
     destroy_window()
     s.finish(client)

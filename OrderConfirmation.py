@@ -19,9 +19,9 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import Struk_support
+import BaseView
 
-def finish(user):
+def start(user):
     global client
     client = user
     vp_start_gui()
@@ -31,7 +31,7 @@ def vp_start_gui():
     global val, w, root
     root = tk.Tk()
     top = Toplevel1 (root)
-    Struk_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
 
 w = None
@@ -43,7 +43,7 @@ def create_Toplevel1(rt, *args, **kwargs):
     root = rt
     w = tk.Toplevel (root)
     top = Toplevel1 (w)
-    Struk_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_Toplevel1():
@@ -89,12 +89,7 @@ class Toplevel1:
         self.Button1.configure(highlightcolor="black")
         self.Button1.configure(pady="0")
         self.Button1.configure(text='''Oke''')
-        self.Button1.configure(command=lambda: Struk_support.finish(client))
-
-if __name__ == '__main__':
-    vp_start_gui()
-
-
+        self.Button1.configure(command=lambda: BaseView.moreTransaction(client))
 
 
 

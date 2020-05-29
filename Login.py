@@ -19,14 +19,18 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import Login_support
+import BaseView
+import Register
+
+def start():
+    vp_start_gui()
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
     top = Toplevel1 (root)
-    Login_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
 
 w = None
@@ -38,7 +42,7 @@ def create_Toplevel1(rt, *args, **kwargs):
     root = rt
     w = tk.Toplevel (root)
     top = Toplevel1 (w)
-    Login_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_Toplevel1():
@@ -60,7 +64,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1370, 749)
         top.resizable(1, 1)
-        top.title("New Toplevel")
+        top.title("LOGIN")
         top.configure(background="#d9d9d9")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -117,7 +121,7 @@ class Toplevel1:
         self.login.configure(activebackground="#ececec")
         self.login.configure(activeforeground="#000000")
         self.login.configure(background="#d9d9d9")
-        self.login.configure(command=lambda :Login_support.login(self.username.get(), self.password.get()))
+        self.login.configure(command=lambda :BaseView.login(self.username.get(), self.password.get()))
         self.login.configure(disabledforeground="#a3a3a3")
         self.login.configure(foreground="#000000")
         self.login.configure(highlightbackground="#d9d9d9")
@@ -132,7 +136,7 @@ class Toplevel1:
         self.register.configure(activeforeground="#000000")
         self.register.configure(background="#d9d9d9")
         self.register.configure(disabledforeground="#a3a3a3")
-        self.register.configure(command=lambda :Login_support.register())
+        self.register.configure(command=lambda :BaseView.redirect(Register))
         self.register.configure(foreground="#000000")
         self.register.configure(highlightbackground="#d9d9d9")
         self.register.configure(highlightcolor="black")

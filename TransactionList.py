@@ -20,12 +20,17 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import ListTransaksi_support
+import BaseView
+import TransactionModel
+import CartModel
+import Login
 
-akun = None
-def show(df):
-    global akun
-    akun = df.copy()
+
+def start(*args):
+    global user, transaction, total
+    transaction = TransactionModel.getAll()
+    total = CartModel.getTotal()
+    user = args[0]
     vp_start_gui()
 
 def vp_start_gui():
@@ -33,7 +38,7 @@ def vp_start_gui():
     global val, w, root
     root = tk.Tk()
     top = List_Transaksi (root)
-    ListTransaksi_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
     
 
@@ -46,7 +51,7 @@ def create_List_Transaksi(rt, *args, **kwargs):
     root = rt
     w = tk.Toplevel (root)
     top = List_Transaksi (w)
-    ListTransaksi_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_List_Transaksi():
@@ -76,7 +81,7 @@ class List_Transaksi:
         self.newTransaction.configure(activebackground="#ececec")
         self.newTransaction.configure(activeforeground="#000000")
         self.newTransaction.configure(background="#d9d9d9")
-        self.newTransaction.configure(command=lambda :ListTransaksi_support.new())
+        self.newTransaction.configure(command=lambda :BaseView.newTransaction())
         self.newTransaction.configure(disabledforeground="#a3a3a3")
         self.newTransaction.configure(foreground="#000000")
         self.newTransaction.configure(highlightbackground="#d9d9d9")
@@ -95,7 +100,7 @@ class List_Transaksi:
         self.logout.configure(highlightcolor="black")
         self.logout.configure(pady="0")
         self.logout.configure(text='''Keluar''')
-        self.logout.configure(command=lambda :ListTransaksi_support.logout())
+        self.logout.configure(command=lambda :BaseView.redirect(Login))
 
         self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
         top.configure(menu = self.menubar)
@@ -109,7 +114,7 @@ class List_Transaksi:
         self.Frame1.configure(background="#d9d9d9")
         
         df = pd.read_csv('Transaction.csv')
-        cols = list(df.columns)
+        cols = ['No', 'Tanggal', 'Pelanggan', 'Total']
         
         self.tree = ttk.Treeview(self.Frame1)
         self.tree.pack()
@@ -117,16 +122,16 @@ class List_Transaksi:
         self.tree.column('#0', width=minwidth)
         self.tree["columns"] = cols
         for i in cols:
-            self.tree.column(i, anchor="w", width=100)
-            self.tree.heading(i, text=i, anchor='w')
+            self.tree.heading(i, text=i.capitalize(), anchor='w')
+        self.tree.column('No', width=25)
+        self.tree.column('Tanggal', width=120)
+        self.tree.column('Pelanggan', width=60)
+        self.tree.column('Total', width=100)
         
-        for index, row in df.iterrows():
-            self.tree.insert("",0,text=index,values=list(row))
-
-if __name__ == '__main__':
-    vp_start_gui()
-
-
+        for i in transaction:
+            index = len(transaction) - transaction.index(i)
+            values = [index, i.date, i.account.username.upper(), total]
+            self.tree.insert("",0,text=index,values=values)
 
 
 

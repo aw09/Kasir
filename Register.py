@@ -19,8 +19,11 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import Register_support
+import Login
 import BaseView
+
+def start():
+    vp_start_gui()
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -71,7 +74,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1370, 749)
         top.resizable(1, 1)
-        top.title("New Toplevel")
+        top.title("REGISTER")
         top.configure(background="#d9d9d9")
 
         self.Label1 = tk.Label(top)
@@ -140,7 +143,7 @@ class Toplevel1:
         self.username.configure(font="TkFixedFont")
         self.username.configure(foreground="#000000")
         self.username.configure(insertbackground="black")
-        self.username.configure(textvariable=BaseView.username)
+        #self.username.configure(textvariable=BaseView.username)
         self.username.configure(text='''Username''')
 
         self.email = tk.Entry(top)
@@ -187,7 +190,7 @@ class Toplevel1:
         self.register.configure(activeforeground="#000000")
         self.register.configure(background="#d9d9d9")
         self.register.configure(cursor="fleur")
-        self.register.configure(command=lambda :Register_support.register(
+        self.register.configure(command=lambda :BaseView.register(
             self.type.get(), 
             self.username.get(), 
             self.email.get(), 
@@ -205,7 +208,7 @@ class Toplevel1:
         self.login.configure(activebackground="#ececec")
         self.login.configure(activeforeground="#000000")
         self.login.configure(background="#d9d9d9")
-        self.login.configure(command=lambda :Register_support.login())
+        self.login.configure(command=lambda :BaseView.redirect(Login))
         self.login.configure(disabledforeground="#a3a3a3")
         self.login.configure(foreground="#000000")
         self.login.configure(highlightbackground="#d9d9d9")
@@ -214,8 +217,6 @@ class Toplevel1:
         self.login.configure(text='''Login''')
 
 
-if __name__ == '__main__':
-    vp_start_gui()
 
 
 

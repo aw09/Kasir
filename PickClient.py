@@ -6,7 +6,6 @@
 #    May 27, 2020 08:53:34 PM +07  platform: Windows NT
 
 import sys
-import Account as ac
 
 try:
     import Tkinter as tk
@@ -20,15 +19,23 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import PilihPelanggan_support
+import BaseView
+import AccountModel as am
+
+def start(*args):
+    global client, clientName, transaction
+    transaction = args[0]
+    client = am.getClient()
+    clientName = [(i.username)for i in client]
+    vp_start_gui()
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    PilihPelanggan_support.set_Tk_var()
+    BaseView.set_Tk_var()
     top = Toplevel1 (root)
-    PilihPelanggan_support.init(root, top)
+    BaseView.init(root, top)
     root.mainloop()
 
 w = None
@@ -39,9 +46,9 @@ def create_Toplevel1(rt, *args, **kwargs):
     #rt = root
     root = rt
     w = tk.Toplevel (root)
-    PilihPelanggan_support.set_Tk_var()
+    BaseView.set_Tk_var()
     top = Toplevel1 (w)
-    PilihPelanggan_support.init(w, top, *args, **kwargs)
+    BaseView.init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_Toplevel1():
@@ -85,8 +92,8 @@ class Toplevel1:
         self.pelanggan = ttk.Combobox(top)
         self.pelanggan.place(relx=0.217, rely=0.338, relheight=0.105
                 , relwidth=0.554)
-        self.pelanggan.configure(textvariable=PilihPelanggan_support.combobox)
-        self.pelanggan['values'] = ac.listPelanggan()
+        #self.pelanggan.configure(textvariable=BaseView.combobox)
+        self.pelanggan['values'] = clientName
         self.pelanggan.configure(takefocus="")
 
         self.pick = tk.Button(top)
@@ -100,11 +107,8 @@ class Toplevel1:
         self.pick.configure(highlightcolor="black")
         self.pick.configure(pady="0")
         self.pick.configure(text='''Konfirmasi''')
-        self.pick.configure(command=lambda :PilihPelanggan_support.new(self.pelanggan.get()))
-
-if __name__ == '__main__':
-    vp_start_gui()
-
+        index = self.pelanggan.current()
+        self.pick.configure(command=lambda :BaseView.viewCart(client[index], transaction))
 
 
 
